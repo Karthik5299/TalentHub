@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TalentHub — HR Platform</title>
+
+  <!-- DaisyUI + Tailwind -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          animation: {
+            'fade-up':   'fadeUp .4s cubic-bezier(.4,0,.2,1) both',
+            'fade-in':   'fadeIn .3s ease both',
+            'scale-in':  'scaleIn .35s cubic-bezier(.34,1.56,.64,1) both',
+            'slide-in':  'slideIn .35s cubic-bezier(.4,0,.2,1) both',
+            'pulse-dot': 'pulseDot 2s ease-in-out infinite',
+          },
+          keyframes: {
+            fadeUp:   { from:{opacity:'0',transform:'translateY(16px)'}, to:{opacity:'1',transform:'translateY(0)'} },
+            fadeIn:   { from:{opacity:'0'}, to:{opacity:'1'} },
+            scaleIn:  { from:{opacity:'0',transform:'scale(.95)'}, to:{opacity:'1',transform:'scale(1)'} },
+            slideIn:  { from:{opacity:'0',transform:'translateX(-14px)'}, to:{opacity:'1',transform:'translateX(0)'} },
+            pulseDot: { '0%,100%':{opacity:'1',transform:'scale(1)'}, '50%':{opacity:'.5',transform:'scale(.8)'} },
+          }
+        }
+      },
+      daisyui: {
+        themes: [
+          {
+            light: {
+              ...require("daisyui/src/theming/themes")["light"],
+              "primary":         "#6366f1",
+              "primary-content": "#ffffff",
+              "secondary":       "#8b5cf6",
+              "accent":          "#06b6d4",
+              "neutral":         "#1e1e2e",
+              "base-100":        "#ffffff",
+              "base-200":        "#f8f8ff",
+              "base-300":        "#f0f0fa",
+            },
+            dark: {
+              ...require("daisyui/src/theming/themes")["dark"],
+              "primary":         "#818cf8",
+              "primary-content": "#ffffff",
+              "secondary":       "#a78bfa",
+              "accent":          "#22d3ee",
+              "neutral":         "#1e1e2e",
+              "base-100":        "#0f1117",
+              "base-200":        "#161b27",
+              "base-300":        "#1e2535",
+            }
+          }
+        ]
+      }
+    }
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    .font-mono, code, kbd { font-family: 'JetBrains Mono', monospace; }
+
+    /* Stagger delays */
+    .a1{animation-delay:.05s!important}.a2{animation-delay:.1s!important}
+    .a3{animation-delay:.15s!important}.a4{animation-delay:.2s!important}
+    .a5{animation-delay:.25s!important}.a6{animation-delay:.3s!important}
+
+    /* Spinner */
+    .spinner{width:15px;height:15px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .55s linear infinite;display:inline-block;vertical-align:middle}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Scrollbar */
+    ::-webkit-scrollbar{width:4px;height:4px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:oklch(var(--bc)/.15);border-radius:4px}
+
+    /* Smooth theme transitions */
+    html{transition:background-color .3s ease,color .3s ease}
+
+    /* Gradient text helper */
+    .grad-text{background:linear-gradient(135deg,oklch(var(--p)),oklch(var(--s)));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+    /* Card hover lift */
+    .lift{transition:transform .2s ease,box-shadow .2s ease}
+    .lift:hover{transform:translateY(-2px);box-shadow:0 12px 32px oklch(var(--bc)/.1)}
+
+    /* Table cleanup */
+    .table :where(thead th){background:oklch(var(--b2));font-size:.65rem;letter-spacing:.08em;text-transform:uppercase}
+    .table :where(tbody tr:hover td){background:oklch(var(--b2)/.7)}
+
+    /* Clock gradient text */
+    .clock-text{background:linear-gradient(135deg,oklch(var(--p)),oklch(var(--s)),oklch(var(--a)));background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradShift 4s ease infinite}
+    @keyframes gradShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+    /* Seconds bar */
+    .seconds-bar{height:2px;background:oklch(var(--b3));border-radius:2px;overflow:hidden}
+    .seconds-fill{height:100%;background:linear-gradient(90deg,oklch(var(--p)),oklch(var(--s)));border-radius:2px;transition:width .9s linear}
+
+    /* Sidebar nav active */
+    .nav-link{transition:all .15s ease;border-radius:.75rem}
+    .nav-link.active,.nav-link:hover{background:oklch(var(--p)/.1);color:oklch(var(--p))}
+    .nav-link.active{font-weight:600;border-left:3px solid oklch(var(--p))}
+
+    /* Status badge dot */
+    .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+  </style>
+</head>
+<body><div id="root"></div></body>
+</html>

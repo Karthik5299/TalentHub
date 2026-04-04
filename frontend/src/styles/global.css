@@ -1,0 +1,67 @@
+/* Only keep admin-specific styles that DaisyUI doesn't cover */
+
+/* ── Admin portal scoped vars ── */
+.adm { font-family: 'DM Sans', 'Inter', sans-serif; }
+
+/* ── Shared animations used outside Tailwind ── */
+@keyframes fadeUp   { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn   { from{opacity:0} to{opacity:1} }
+@keyframes scaleIn  { from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
+@keyframes spin     { to{transform:rotate(360deg)} }
+@keyframes shimmer  { from{background-position:-200% 0} to{background-position:200% 0} }
+
+/* ── Admin skeleton ── */
+.askel{background:linear-gradient(90deg,#f3f4f6 25%,#e9eaec 50%,#f3f4f6 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+
+/* ── Admin styles (unchanged) ── */
+.adm-wrap{display:flex;min-height:100vh}
+/* Desktop sidebar — always shown via CSS not JS */
+.adm-desktop-side{display:block!important}
+.adm-main{margin-left:220px;flex:1;padding:32px 36px;background:#f8f9ff;min-height:100vh}
+.adm-top{display:none;position:fixed;top:0;left:0;right:0;height:52px;background:#fff;border-bottom:1px solid #e8eaf6;align-items:center;justify-content:space-between;padding:0 14px;z-index:300}
+.abtn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;font-size:13px;font-weight:500;border-radius:8px;cursor:pointer;transition:all .14s ease;border:none;white-space:nowrap;font-family:inherit}
+.abtn:disabled{opacity:.4;cursor:not-allowed}
+.abtn-primary{background:#4f52d4;color:#fff}.abtn-primary:hover:not(:disabled){background:#4338ca}
+.abtn-outline{background:transparent;color:#1a1a2e;border:1px solid #e8eaf6}.abtn-outline:hover:not(:disabled){border-color:#4f52d4;background:#f5f5ff}
+.abtn-danger{background:transparent;color:#dc2626;border:1px solid #fecaca}.abtn-danger:hover:not(:disabled){background:#fef2f2}
+.abtn-success{background:transparent;color:#059669;border:1px solid #bbf7d0}.abtn-success:hover:not(:disabled){background:#f0fdf4}
+.abtn-sm{padding:4px 10px;font-size:12px}
+.abtn-icon{width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;border:1px solid #e8eaf6;background:#fff;color:#6b7280;transition:all .14s;font-family:inherit}
+.abtn-icon:hover{color:#1a1a2e;border-color:#c5cae9}
+.ainput{width:100%;padding:7px 11px;border:1px solid #e8eaf6;border-radius:8px;font-size:13px;color:#1a1a2e;background:#fff;outline:none;transition:all .14s;font-family:inherit}
+.ainput:focus{border-color:#4f52d4;box-shadow:0 0 0 2px rgba(79,82,212,.12)}
+.ainput::placeholder{color:#9fa8c7}
+.ainput option{background:#fff}
+.alabel{display:block;font-size:12px;font-weight:500;color:#5c6494;margin-bottom:4px}
+.acard{background:#fff;border:1px solid #e8eaf6;border-radius:8px}
+.abadge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;font-family:'DM Mono','JetBrains Mono',monospace}
+.ab-green{background:#f0fdf4;color:#059669}.ab-red{background:#fef2f2;color:#dc2626}
+.ab-amber{background:#fffbeb;color:#d97706}.ab-blue{background:#eff6ff;color:#2563eb}.ab-gray{background:#f9fafb;color:#6b7280}
+.atable{width:100%;border-collapse:collapse;font-size:13px}
+.atable th{padding:9px 13px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#9fa8c7;border-bottom:1px solid #e8eaf6;white-space:nowrap;background:#f8f9ff}
+.atable td{padding:11px 13px;color:#5c6494;border-bottom:1px solid #f0f2ff;font-family:inherit}
+.atable tbody tr{transition:background .14s}
+.atable tbody tr:hover{background:#f8f9ff}
+.atable tbody tr:last-child td{border-bottom:none}
+.aoverlay{position:fixed;inset:0;background:rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px;animation:fadeIn .15s}
+.amodal{background:#fff;border:1px solid #e8eaf6;border-radius:12px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.12);animation:fadeUp .2s ease}
+.amodal-h{padding:18px 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e8eaf6}
+.amodal-b{padding:18px 22px;display:flex;flex-direction:column;gap:13px}
+.amodal-f{padding:13px 22px;border-top:1px solid #e8eaf6;display:flex;justify-content:flex-end;gap:8px}
+.aspinner{width:14px;height:14px;border:2px solid #e5e7eb;border-top-color:#4f52d4;border-radius:50%;animation:spin .6s linear infinite}
+.atag{display:inline-block;padding:2px 7px;background:#eef0ff;border-radius:4px;font-size:11px;font-family:'JetBrains Mono',monospace;color:#5c6494}
+.adivider{height:1px;background:#e8eaf6;margin:16px 0}
+.apag{display:flex;align-items:center;gap:3px;padding:10px 14px}
+.apg{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid #e8eaf6;border-radius:4px;font-size:12px;cursor:pointer;background:#fff;color:#5c6494;transition:all .14s;font-family:inherit}
+.apg:hover{border-color:#4f52d4;color:#4f52d4}
+.apg.on{background:#4f52d4;color:#fff;border-color:#4f52d4}
+.aempty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:44px 20px;gap:8px;color:#9fa8c7;font-size:13px}
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:768px){
+  .adm-desktop-side{display:none!important}
+  .adm-main{margin-left:0!important;padding:14px;padding-top:66px}
+  .adm-top{display:flex}
+  .amodal{max-width:100%!important;max-height:95vh;border-radius:16px 16px 0 0}
+  .aoverlay{align-items:flex-end!important;padding:0!important}
+  .atable{font-size:12px}.atable th,.atable td{padding:8px 10px}
+}

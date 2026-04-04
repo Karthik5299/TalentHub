@@ -1,0 +1,501 @@
+{
+  "info": {
+    "name": "TalentHub — Complete API",
+    "description": "TalentHub HR Management System — all routes.\n\n## Order to test:\n1. Health Check\n2. Bootstrap (create first admin)\n3. Login → token auto-saved\n4. Create Department → deptId auto-saved\n5. Create Employee → employeeId auto-saved\n6. Register Employee User → userId auto-saved\n7. Link employee to user\n8. Attendance, Leave, Kin, Payroll",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url",    "value": "http://localhost:5000" },
+    { "key": "token",       "value": "" },
+    { "key": "employeeId",  "value": "" },
+    { "key": "deptId",      "value": "" },
+    { "key": "leaveId",     "value": "" },
+    { "key": "userId",      "value": "" },
+    { "key": "kinId",       "value": "" },
+    { "key": "payrollId",   "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "00 — Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": { "method": "GET", "url": "{{base_url}}/api/health" }
+        }
+      ]
+    },
+    {
+      "name": "01 — Auth",
+      "item": [
+        {
+          "name": "Bootstrap (first admin only)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/auth/bootstrap",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Super Admin\",\n  \"email\": \"admin@talenthub.com\",\n  \"password\": \"Admin@1234\"\n}" }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const json = pm.response.json();",
+              "if (json.data && json.data.accessToken) {",
+              "  pm.collectionVariables.set('token', json.data.accessToken);",
+              "  console.log('✅ Token saved');",
+              "}"
+            ]}
+          }],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/auth/login",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@talenthub.com\",\n  \"password\": \"Admin@1234\"\n}" }
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": { "method": "GET", "url": "{{base_url}}/api/auth/me" }
+        },
+        {
+          "name": "Register Employee User (admin)",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const json = pm.response.json();",
+              "if (json.data && json.data.user) {",
+              "  pm.collectionVariables.set('userId', json.data.user.id);",
+              "  console.log('✅ userId saved:', json.data.user.id);",
+              "}"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/auth/register",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"John Employee\",\n  \"email\": \"john@talenthub.com\",\n  \"password\": \"Employee@1234\",\n  \"role\": \"employee\"\n}" }
+          }
+        },
+        {
+          "name": "Link Employee Record to User",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/auth/link-employee",
+            "body": { "mode": "raw", "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"employeeId\": \"{{employeeId}}\"\n}" }
+          }
+        },
+        {
+          "name": "Get All Users",
+          "request": { "method": "GET", "url": "{{base_url}}/api/auth/users" }
+        },
+        {
+          "name": "Toggle User Active/Inactive",
+          "request": { "method": "PUT", "url": "{{base_url}}/api/auth/users/{{userId}}/toggle" }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/auth/change-password",
+            "body": { "mode": "raw", "raw": "{\n  \"currentPassword\": \"Admin@1234\",\n  \"newPassword\": \"Admin@5678\"\n}" }
+          }
+        },
+        {
+          "name": "Refresh Token (cookie-based)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/refresh"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": { "method": "POST", "url": "{{base_url}}/api/auth/logout" }
+        }
+      ]
+    },
+    {
+      "name": "02 — Departments",
+      "item": [
+        {
+          "name": "Create Department",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const json = pm.response.json();",
+              "if (json.data && json.data.department) {",
+              "  pm.collectionVariables.set('deptId', json.data.department._id);",
+              "  console.log('✅ deptId saved:', json.data.department._id);",
+              "}"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/departments",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Engineering\",\n  \"code\": \"ENG\",\n  \"description\": \"Software and Platform Engineering\"\n}" }
+          }
+        },
+        {
+          "name": "Get All Departments",
+          "request": { "method": "GET", "url": "{{base_url}}/api/departments" }
+        },
+        {
+          "name": "Get Department by ID",
+          "request": { "method": "GET", "url": "{{base_url}}/api/departments/{{deptId}}" }
+        },
+        {
+          "name": "Update Department",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/departments/{{deptId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"description\": \"Backend, Frontend and DevOps\",\n  \"isActive\": true\n}" }
+          }
+        },
+        {
+          "name": "Delete Department",
+          "request": { "method": "DELETE", "url": "{{base_url}}/api/departments/{{deptId}}" }
+        }
+      ]
+    },
+    {
+      "name": "03 — Employees",
+      "item": [
+        {
+          "name": "Create Employee",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const json = pm.response.json();",
+              "if (json.data && json.data.employee) {",
+              "  pm.collectionVariables.set('employeeId', json.data.employee._id);",
+              "  console.log('✅ employeeId saved:', json.data.employee._id);",
+              "}"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/employees",
+            "body": { "mode": "raw", "raw": "{\n  \"firstName\": \"Arjun\",\n  \"lastName\": \"Sharma\",\n  \"email\": \"arjun@company.com\",\n  \"phone\": \"+91 98765 43210\",\n  \"department\": \"{{deptId}}\",\n  \"position\": \"Senior Engineer\",\n  \"salary\": 95000,\n  \"joiningDate\": \"2024-01-15\",\n  \"status\": \"active\",\n  \"address\": {\n    \"street\": \"123 MG Road\",\n    \"city\": \"Bangalore\",\n    \"state\": \"Karnataka\",\n    \"zip\": \"560001\"\n  }\n}" }
+          }
+        },
+        {
+          "name": "Get All Employees",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/employees?page=1&limit=10",
+              "query": [
+                { "key": "page",       "value": "1" },
+                { "key": "limit",      "value": "10" },
+                { "key": "search",     "value": "",   "disabled": true },
+                { "key": "department", "value": "",   "disabled": true },
+                { "key": "status",     "value": "active", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Employees",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/employees?search=Arjun",
+              "query": [{ "key": "search", "value": "Arjun" }]
+            }
+          }
+        },
+        {
+          "name": "Get Employee Stats (dashboard)",
+          "request": { "method": "GET", "url": "{{base_url}}/api/employees/stats" }
+        },
+        {
+          "name": "Get Employee by ID",
+          "request": { "method": "GET", "url": "{{base_url}}/api/employees/{{employeeId}}" }
+        },
+        {
+          "name": "Get Employee Full Profile",
+          "request": { "method": "GET", "url": "{{base_url}}/api/employees/{{employeeId}}/profile" }
+        },
+        {
+          "name": "Update Employee",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/employees/{{employeeId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"position\": \"Lead Engineer\",\n  \"salary\": 110000\n}" }
+          }
+        },
+        {
+          "name": "Offboard (Delete) Employee",
+          "request": { "method": "DELETE", "url": "{{base_url}}/api/employees/{{employeeId}}" }
+        }
+      ]
+    },
+    {
+      "name": "04 — Attendance",
+      "item": [
+        {
+          "name": "Clock In",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/attendance/clock-in",
+            "body": { "mode": "raw", "raw": "{\n  \"employeeId\": \"{{employeeId}}\"\n}" }
+          }
+        },
+        {
+          "name": "Clock Out",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/attendance/clock-out",
+            "body": { "mode": "raw", "raw": "{\n  \"employeeId\": \"{{employeeId}}\"\n}" }
+          }
+        },
+        {
+          "name": "Mark Absent (admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/attendance/mark-absent",
+            "body": { "mode": "raw", "raw": "{\n  \"employeeId\": \"{{employeeId}}\",\n  \"date\": \"2025-01-20\"\n}" }
+          }
+        },
+        {
+          "name": "Get Today's Attendance",
+          "request": { "method": "GET", "url": "{{base_url}}/api/attendance/today" }
+        },
+        {
+          "name": "Get Attendance History",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/attendance/history?page=1&limit=20",
+              "query": [
+                { "key": "page",        "value": "1" },
+                { "key": "limit",       "value": "20" },
+                { "key": "employeeId",  "value": "{{employeeId}}", "disabled": true },
+                { "key": "startDate",   "value": "2025-01-01",     "disabled": true },
+                { "key": "endDate",     "value": "2025-12-31",     "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Monthly Pulse (chart data)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/attendance/monthly-pulse?year=2025&month=3",
+              "query": [
+                { "key": "year",  "value": "2025" },
+                { "key": "month", "value": "3" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 — Leaves",
+      "item": [
+        {
+          "name": "Get Leave Stats",
+          "request": { "method": "GET", "url": "{{base_url}}/api/leaves/stats" }
+        },
+        {
+          "name": "Apply for Leave (admin on behalf)",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const json = pm.response.json();",
+              "if (json.data && json.data.leave) {",
+              "  pm.collectionVariables.set('leaveId', json.data.leave._id);",
+              "  console.log('✅ leaveId saved:', json.data.leave._id);",
+              "}"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/leaves",
+            "body": { "mode": "raw", "raw": "{\n  \"employeeId\": \"{{employeeId}}\",\n  \"leaveType\": \"annual\",\n  \"startDate\": \"2025-06-10\",\n  \"endDate\": \"2025-06-14\",\n  \"reason\": \"Family vacation\"\n}" }
+          }
+        },
+        {
+          "name": "Get All Leaves",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/leaves?page=1&limit=10",
+              "query": [
+                { "key": "page",        "value": "1" },
+                { "key": "limit",       "value": "10" },
+                { "key": "status",      "value": "pending",       "disabled": true },
+                { "key": "employeeId",  "value": "{{employeeId}}","disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Leave by ID",
+          "request": { "method": "GET", "url": "{{base_url}}/api/leaves/{{leaveId}}" }
+        },
+        {
+          "name": "Approve Leave",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/leaves/{{leaveId}}/review",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"approved\",\n  \"adminNote\": \"Approved. Enjoy your vacation!\"\n}" }
+          }
+        },
+        {
+          "name": "Decline Leave",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/leaves/{{leaveId}}/review",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"declined\",\n  \"adminNote\": \"Project deadline. Please reschedule.\"\n}" }
+          }
+        },
+        {
+          "name": "Cancel (Delete) Pending Leave",
+          "request": { "method": "DELETE", "url": "{{base_url}}/api/leaves/{{leaveId}}" }
+        }
+      ]
+    },
+    {
+      "name": "06 — Emergency Contacts (Kin)",
+      "item": [
+        {
+          "name": "Get All Kin + Missing Alert",
+          "request": { "method": "GET", "url": "{{base_url}}/api/kin" }
+        },
+        {
+          "name": "Create / Update Kin",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const json = pm.response.json();",
+              "if (json.data && json.data.kin) {",
+              "  pm.collectionVariables.set('kinId', json.data.kin._id);",
+              "  console.log('✅ kinId saved:', json.data.kin._id);",
+              "}"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/kin",
+            "body": { "mode": "raw", "raw": "{\n  \"employeeId\": \"{{employeeId}}\",\n  \"name\": \"Sunita Sharma\",\n  \"relationship\": \"spouse\",\n  \"phone\": \"+91 98765 00001\",\n  \"email\": \"sunita@email.com\",\n  \"address\": \"123 MG Road, Bangalore\"\n}" }
+          }
+        },
+        {
+          "name": "Get Kin by Employee ID",
+          "request": { "method": "GET", "url": "{{base_url}}/api/kin/employee/{{employeeId}}" }
+        },
+        {
+          "name": "Delete Kin Record",
+          "request": { "method": "DELETE", "url": "{{base_url}}/api/kin/{{kinId}}" }
+        }
+      ]
+    },
+    {
+      "name": "07 — Payroll",
+      "item": [
+        {
+          "name": "Generate Payroll (all active employees)",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const json = pm.response.json();",
+              "if (json.data && json.data.records && json.data.records.length > 0) {",
+              "  pm.collectionVariables.set('payrollId', json.data.records[0]._id);",
+              "  console.log('✅ payrollId saved:', json.data.records[0]._id);",
+              "}"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/payroll/generate",
+            "body": { "mode": "raw", "raw": "{\n  \"month\": 3,\n  \"year\": 2025\n}" }
+          }
+        },
+        {
+          "name": "Generate Payroll (single employee)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/payroll/generate",
+            "body": { "mode": "raw", "raw": "{\n  \"month\": 3,\n  \"year\": 2025,\n  \"employeeId\": \"{{employeeId}}\"\n}" }
+          }
+        },
+        {
+          "name": "Get Payroll Summary (yearly chart)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/payroll/summary?year=2025",
+              "query": [{ "key": "year", "value": "2025" }]
+            }
+          }
+        },
+        {
+          "name": "Get Employee Payroll History",
+          "request": { "method": "GET", "url": "{{base_url}}/api/payroll/employee/{{employeeId}}" }
+        },
+        {
+          "name": "Get All Payroll Records",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/payroll?month=3&year=2025&page=1&limit=20",
+              "query": [
+                { "key": "month",      "value": "3" },
+                { "key": "year",       "value": "2025" },
+                { "key": "page",       "value": "1" },
+                { "key": "limit",      "value": "20" },
+                { "key": "status",     "value": "generated", "disabled": true },
+                { "key": "employeeId", "value": "{{employeeId}}", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Payroll Record by ID",
+          "request": { "method": "GET", "url": "{{base_url}}/api/payroll/{{payrollId}}" }
+        },
+        {
+          "name": "Update Payroll (add bonus / adjust deductions)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/payroll/{{payrollId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"bonus\": 5000,\n  \"otherAllowances\": 1000,\n  \"notes\": \"Performance bonus for Q1\"\n}" }
+          }
+        },
+        {
+          "name": "Mark Payroll as Paid",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/payroll/{{payrollId}}/mark-paid",
+            "body": { "mode": "raw", "raw": "{\n  \"paymentMethod\": \"bank_transfer\",\n  \"paidAt\": \"2025-03-31\"\n}" }
+          }
+        },
+        {
+          "name": "Delete Payroll Record (draft only)",
+          "request": { "method": "DELETE", "url": "{{base_url}}/api/payroll/{{payrollId}}" }
+        }
+      ]
+    }
+  ]
+}
