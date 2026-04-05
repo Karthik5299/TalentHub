@@ -12,6 +12,7 @@ export const EVENTS = {
   CLOCK_IN:          'attendance:clockIn',
   CLOCK_OUT:         'attendance:clockOut',
   PAYROLL_GENERATED: 'payroll:generated',
+  NOTIFICATION_NEW:  'notification:new',
   REFRESH:           'refresh',
 };
 
@@ -81,10 +82,17 @@ export function useSocket() {
 // Usage:  useSocketEvent(EVENTS.LEAVE_APPLIED, (data) => reload())
 export function useSocketEvent(event, handler, deps = []) {
   const { socket } = useSocket() || {};
+  const handlerRef = React.useRef(handler);
 
-  useEffect(() => {
-  if (!socket || !event || !handler) return;
-  socket.on(event, handler);
-  return () => socket.off(event, handler);
-}, [socket, event, ...deps]);
+  // Keep ref up to date so we always call the latest handler
+  React.useEffect(() => {
+    handlerRef.current = handler;
+  });
+
+  React.useEffect(() => {
+    if (!socket || !event) return;
+    const fn = (...args) => handlerRef.current(...args);
+    socket.on(event, fn);
+    return () => socket.off(event, fn);
+  }, [socket, event]);
 }

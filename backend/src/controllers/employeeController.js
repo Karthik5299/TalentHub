@@ -5,6 +5,7 @@ const Leave     = require('../models/Leave');
 const Payroll   = require('../models/Payroll');
 const ApiResponse   = require('../utils/apiResponse');
 const LeaveBalance  = require('../models/LeaveBalance');
+const { notifyAllAdmins } = require('../utils/notify');
 
 // ─────────────────────────────────────────────────────────
 // GET /api/employees         — paginated, searchable
@@ -126,6 +127,16 @@ exports.createEmployee = async (req, res, next) => {
 
     // Auto-create leave balance for current year
     await LeaveBalance.getOrCreate(employee._id, new Date().getFullYear());
+
+    // 🔔 Notify all admins
+    notifyAllAdmins({
+      type:    'employee_joined',
+      title:   'New Employee Onboarded',
+      message: `${employee.firstName} ${employee.lastName} has been added as ${employee.position}.`,
+      icon:    '👋',
+      link:    '/admin/employees',
+      meta:    { employeeId: employee._id },
+    });
 
     return ApiResponse.success(res, { employee }, 'Employee onboarded successfully.', 201);
   } catch (error) { next(error); }

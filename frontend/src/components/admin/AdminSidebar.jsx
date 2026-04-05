@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
+import NotificationBell from '../common/NotificationBell';
 import toast from 'react-hot-toast';
 
 const NAV = [
@@ -86,6 +87,10 @@ function SideContent({ onClose }) {
             <p style={{ fontSize:12, fontWeight:600, color:'#1a1a2e', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{user?.name}</p>
             <p style={{ fontSize:10, color:'#9fa8c7' }}>Administrator</p>
           </div>
+        </div>
+        {/* Notification bell */}
+        <div style={{ padding:'4px 0 8px', display:'flex', justifyContent:'center' }}>
+          <NotificationBell variant="admin" />
         </div>
         <button onClick={doLogout} style={{
           display:'flex', alignItems:'center', gap:9, width:'100%',

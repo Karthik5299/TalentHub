@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import AdminSidebar from '../admin/AdminSidebar';
-import EmpSidebar  from '../employee/EmpSidebar';
+import AdminSidebar     from '../admin/AdminSidebar';
+import EmpSidebar      from '../employee/EmpSidebar';
+import NotificationBell from './NotificationBell';
 
 export function AdminLayout({ children }) {
   const [open, setOpen] = useState(false);
@@ -10,10 +11,12 @@ export function AdminLayout({ children }) {
       {/* Mobile topbar — only shows on small screens */}
       <header className="adm-top">
         <button className="abtn-icon" onClick={() => setOpen(true)}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
         </button>
         <span style={{ fontSize:13, fontWeight:700, color:'#1a1a2e' }}>TalentHub</span>
-        <div style={{ width:30 }} />
+        <NotificationBell variant="admin" />
       </header>
       <main className="adm-main">{children}</main>
     </div>
@@ -38,15 +41,20 @@ export function EmpLayout({ children }) {
       {/* Mobile topbar */}
       <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-base-100 border-b border-base-300 flex items-center justify-between px-4 z-30">
         <button onClick={() => setOpen(true)} className="btn btn-ghost btn-sm btn-square">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
         </button>
         <span className="text-sm font-bold text-base-content">TalentHub</span>
-        <button onClick={toggleTheme} className="btn btn-ghost btn-sm btn-square text-base-content/50">
-          {theme === 'light'
-            ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" strokeWidth="2"/></svg>
-            : <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
-          }
-        </button>
+        <div className="flex items-center gap-1">
+          <NotificationBell variant="employee" />
+          <button onClick={toggleTheme} className="btn btn-ghost btn-sm btn-square text-base-content/50">
+            {theme === 'light'
+              ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" strokeWidth="2"/></svg>
+              : <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+            }
+          </button>
+        </div>
       </header>
 
       {/* Main content */}

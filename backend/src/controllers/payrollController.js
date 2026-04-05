@@ -3,6 +3,7 @@ const Employee   = require('../models/Employee');
 const Attendance = require('../models/Attendance');
 const ApiResponse = require('../utils/apiResponse');
 const { emitToEmployee, EVENTS } = require('../socket');
+const { notifyEmployee } = require('../utils/notify');
 
 // ─────────────────────────────────────────────────────────
 // helpers
@@ -126,6 +127,22 @@ exports.generatePayroll = async (req, res, next) => {
       });
 
       generated.push(record);
+    }
+
+    // 🔔 Notify each employee their payslip is ready
+    const MONTHS = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+
+    for (const record of generated) {
+      if (record.employee) {
+        notifyEmployee(record.employee, {
+          type:    'payroll_generated',
+          title:   'Payslip Ready 💰',
+          message: `Your payslip for ${MONTHS[record.month]} ${record.year} is ready. Net: ₹${Number(record.netSalary || 0).toLocaleString('en-IN')}.`,
+          icon:    '💰',
+          link:    '/employee/payslips',
+          meta:    { month: record.month, year: record.year, netSalary: record.netSalary },
+        });
+      }
     }
 
     // 🔌 Real-time — notify each employee their payslip is ready

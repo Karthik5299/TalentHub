@@ -2,6 +2,7 @@ const Leave        = require('../models/Leave');
 const LeaveBalance = require('../models/LeaveBalance');
 const ApiResponse  = require('../utils/apiResponse');
 const { emitToAdmins, emitToEmployee, EVENTS } = require('../socket');
+const { notifyAllAdmins, notifyEmployee } = require('../utils/notify');
 
 // ─────────────────────────────────────────────────────────
 // Helpers
@@ -75,6 +76,17 @@ exports.applyLeave = async (req, res, next) => {
     }
 
     await leave.populate('employee', 'firstName lastName employeeCode');
+
+    // 🔔 Notifications: persist + real-time
+    const empName = `${leave.employee.firstName} ${leave.employee.lastName}`;
+    notifyAllAdmins({
+      type:    'leave_applied',
+      title:   'New Leave Request',
+      message: `${empName} applied for ${leave.totalDays} day(s) of ${leave.leaveType} leave.`,
+      icon:    '✈️',
+      link:    '/admin/leaves',
+      meta:    { leaveId: leave._id, employeeId: leave.employee._id },
+    });
 
     // 🔌 Real-time: notify all admins instantly
     emitToAdmins(EVENTS.LEAVE_APPLIED, {
@@ -191,6 +203,19 @@ exports.reviewLeave = async (req, res, next) => {
 
     await leave.populate('employee', 'firstName lastName employeeCode');
 
+    // 🔔 Notify employee
+    const isApproved = status === 'approved';
+    notifyEmployee(leave.employee._id, {
+      type:    isApproved ? 'leave_approved' : 'leave_declined',
+      title:   isApproved ? 'Leave Approved ✅' : 'Leave Declined ❌',
+      message: isApproved
+        ? `Your ${leave.leaveType} leave (${leave.totalDays}d) has been approved.`
+        : `Your ${leave.leaveType} leave (${leave.totalDays}d) was declined.${leave.adminNote ? ' Note: ' + leave.adminNote : ''}`,
+      icon:    isApproved ? '✅' : '❌',
+      link:    '/employee/leaves',
+      meta:    { leaveId: leave._id },
+    });
+
     // 🔌 Real-time: notify the employee who owns this leave
     emitToEmployee(leave.employee._id, EVENTS.LEAVE_REVIEWED, {
       leave: {
@@ -241,6 +266,16 @@ exports.cancelLeave = async (req, res, next) => {
         { upsert: true }
       );
     }
+
+    // 🔔 Notify admins
+    notifyAllAdmins({
+      type:    'leave_cancelled',
+      title:   'Leave Cancelled',
+      message: `An employee cancelled their pending leave request.`,
+      icon:    '🚫',
+      link:    '/admin/leaves',
+      meta:    { leaveId: String(leaveId) },
+    });
 
     // 🔌 Real-time: notify admins of cancellation
     emitToAdmins(EVENTS.LEAVE_CANCELLED, { leaveId: String(leaveId), employeeId: String(employeeId) });

@@ -2,6 +2,7 @@ const Attendance = require('../models/Attendance');
 const Employee   = require('../models/Employee');
 const ApiResponse = require('../utils/apiResponse');
 const { emitToAdmins, EVENTS } = require('../socket');
+const { notifyAllAdmins } = require('../utils/notify');
 
 // ─────────────────────────────────────────────
 // @desc   Clock in
@@ -46,6 +47,17 @@ exports.clockIn = async (req, res, next) => {
     );
 
     await attendance.populate('employee', 'firstName lastName employeeCode department position');
+
+    // 🔔 Notify admins
+    const ciName = `${attendance.employee.firstName} ${attendance.employee.lastName}`;
+    notifyAllAdmins({
+      type:    'clock_in',
+      title:   'Employee Clocked In',
+      message: `${ciName} clocked in at ${new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}${isLate ? ' (late)' : ''}.`,
+      icon:    '🟢',
+      link:    '/admin/attendance',
+      meta:    { employeeId: attendance.employee._id, status: attendance.status },
+    });
 
     // 🔌 Real-time: notify admins
     emitToAdmins(EVENTS.CLOCK_IN, {
@@ -94,6 +106,17 @@ exports.clockOut = async (req, res, next) => {
     attendance.clockOut = new Date();
     await attendance.save();
     await attendance.populate('employee', 'firstName lastName employeeCode');
+
+    // 🔔 Notify admins
+    const coName = `${attendance.employee.firstName} ${attendance.employee.lastName}`;
+    notifyAllAdmins({
+      type:    'clock_out',
+      title:   'Employee Clocked Out',
+      message: `${coName} clocked out. Hours worked: ${attendance.workHours || '—'}h.`,
+      icon:    '🔴',
+      link:    '/admin/attendance',
+      meta:    { employeeId: attendance.employee._id, workHours: attendance.workHours },
+    });
 
     // 🔌 Real-time: notify admins
     emitToAdmins(EVENTS.CLOCK_OUT, {

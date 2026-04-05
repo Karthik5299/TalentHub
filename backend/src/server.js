@@ -18,6 +18,7 @@ const authRoutes     = require('./routes/authRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
 const { deptRouter, attRouter, leaveRouter, kinRouter, payrollRouter } = require('./routes/index');
 const { initSocket } = require('./socket');    // ← socket module
+const notifRoutes    = require('./routes/notificationRoutes');
 
 connectDB();
 
@@ -75,7 +76,8 @@ app.use('/api/departments', deptRouter);
 app.use('/api/attendance',  attRouter);
 app.use('/api/leaves',      leaveRouter);
 app.use('/api/kin',         kinRouter);
-app.use('/api/payroll',     payrollRouter);
+app.use('/api/payroll',       payrollRouter);
+app.use('/api/notifications', notifRoutes);
 
 // ── 404 ───────────────────────────────────────────────────
 app.all('*', (req, res) => res.status(404).json({
