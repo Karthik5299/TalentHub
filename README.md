@@ -14,7 +14,7 @@ A full-stack HR management system built with the MERN stack. Manage employees, a
 
 | Portal | URL |
 |--------|-----|
-| Frontend | https://talenthub-frontend.onrender.com |
+| Frontend |https://talenthub-frontend-u0mf.onrender.com|
 | Backend API | https://talenthub-backend-ehju.onrender.com/api/health |
 
 > ⚠️ Hosted on Render free tier — backend may take ~30 seconds to wake up on first visit.
