@@ -34,7 +34,7 @@ export function SocketProvider({ children }) {
       return;
     }
 
-    const token = localStorage.getItem('accessToken');
+    const token = sessionStorage.getItem('accessToken');
     if (!token) return;
 
     // Create socket connection

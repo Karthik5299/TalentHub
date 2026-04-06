@@ -16,10 +16,10 @@ export function AuthProvider({ children }) {
 
   const applyToken = useCallback((token) => {
     if (token) {
-      localStorage.setItem('accessToken', token);
+      sessionStorage.setItem('accessToken', token);
       api.defaults.headers.common.Authorization = `Bearer ${token}`;
     } else {
-      localStorage.removeItem('accessToken');
+      sessionStorage.removeItem('accessToken');
       delete api.defaults.headers.common.Authorization;
     }
   }, []);
@@ -39,7 +39,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const token = localStorage.getItem('accessToken');
+        const token = sessionStorage.getItem('accessToken');
 
         if (!token) {
           setLoading(false);

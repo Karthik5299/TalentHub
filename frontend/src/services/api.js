@@ -9,7 +9,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    const token = sessionStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -45,7 +45,7 @@ api.interceptors.response.use(
         originalRequest.url?.includes('/auth/refresh') ||
         originalRequest.url?.includes('/auth/login')
       ) {
-        localStorage.removeItem('accessToken');
+        sessionStorage.removeItem('accessToken');
         delete api.defaults.headers.common.Authorization;
         window.location.href = '/login';
         return Promise.reject(error);
@@ -69,7 +69,7 @@ api.interceptors.response.use(
         const { data } = await api.post('/auth/refresh');
         const newToken = data.data.accessToken;
 
-        localStorage.setItem('accessToken', newToken);
+        sessionStorage.setItem('accessToken', newToken);
         api.defaults.headers.common.Authorization = `Bearer ${newToken}`;
 
         processQueue(null, newToken);
@@ -78,7 +78,7 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        localStorage.removeItem('accessToken');
+        sessionStorage.removeItem('accessToken');
         delete api.defaults.headers.common.Authorization;
         window.location.href = '/login';
         return Promise.reject(refreshError);
