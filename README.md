@@ -220,10 +220,14 @@ Deployed on **Render** (backend + frontend) with **MongoDB Atlas**.
 
 ## 👨‍💻 Author
 
-**Karthik** — built with Claude AI assistance
+**Karthik**
 
 ---
 
 ## 📄 License
 
 MIT License — free to use and modify.
+
+## for user experience 
+email:user@talenthub.com 
+pass:11221822
